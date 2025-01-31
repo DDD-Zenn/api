@@ -1,7 +1,7 @@
 .PHONY: build
 
 up:
-	docker build -t ddd-api . && \
+	docker-compose build && \
 	docker-compose up -d
 
 down:
