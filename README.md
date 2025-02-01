@@ -3,7 +3,7 @@
 ## 立ち上げ方法
 
 ```
-docker build -t ddd-api .
+docker-compose build
 docker-compose up -d
 docker-compose down
 ```
