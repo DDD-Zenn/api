@@ -2,26 +2,30 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"log"
-	"net/http"
 	"os"
 
 	"github.com/DDD-Zenn/api/application/chat"
-	chatCmd "github.com/DDD-Zenn/api/application/chat/command"
 	"github.com/DDD-Zenn/api/domain/repoIF"
 	"github.com/DDD-Zenn/api/external/service"
 	"github.com/DDD-Zenn/api/infrastructure/repo"
-	"github.com/gin-gonic/gin"
 	"github.com/google/generative-ai-go/genai"
 	"google.golang.org/api/option"
+
+	"github.com/DDD-Zenn/api/router"
+	"github.com/DDD-Zenn/api/presentation"
+	"github.com/DDD-Zenn/api/infrastructure/database"
 )
 
 var chatUsecase *chat.ChatUsecase
 
 func main() {
-
 	ctx := context.Background()
+
+	// DB初期化
+	database.InitDB()
+
+	// APIKEY
 	apiKey := os.Getenv("GEMINI_API_KEY")
 	if apiKey == "" {
 		log.Fatal("GEMINI_API_KEY is not set")
@@ -32,44 +36,29 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to create Gemini client: %v", err)
 	}
+
 	defer client.Close()
 
 	// Gemini サービスを初期化
 	geminiService := service.NewGeminiService(client)
-	var cRepo repoIF.Chat = repo.NewChatRepo(ctx)
-	chatUsecase = chat.NewChatUsecase(cRepo, geminiService)
-	engine := gin.Default()
 
-	engine.POST("/chat", func(c *gin.Context) {
-		var cmd chatCmd.CreateChatCommand
+	// Hello
+	helloPresenter := presentation.NewHelloPresenter()
 
-		if err := c.ShouldBindJSON(&cmd); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
+	// User
+	var userRepo repoIF.UserRepoIF = repo.NewUserRepo(ctx)
+	userService := service.NewUserService(userRepo)
+	userPresenter := presentation.NewUserPresenter(userService)
 
-		validCmd, err := chatCmd.NewChatCreate(cmd)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-		output, err := chatUsecase.CreateChat(ctx, validCmd)
-		if err != nil {
-			log.Printf("Failed to list tasks: %v", err)
-		}
+	// Chat
+	var chatRepo repoIF.Chat = repo.NewChatRepo(ctx)
+	chatUsecase = chat.NewChatUsecase(chatRepo, geminiService)
+	chatPresenter := presentation.NewChatPresenter(chatUsecase)
 
-		respBytes, err := json.Marshal(output)
-		if err != nil {
-			log.Printf("Failed to marshal tasks: %v", err)
-		}
-
-		c.Data(http.StatusOK, "application/json; charset=utf-8", respBytes)
-	})
-
-	engine.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "hello world",
-		})
-	})
+	engine := router.SetupRouter(
+		helloPresenter,
+		userPresenter,
+		chatPresenter,
+	)
 	engine.Run(":8080")
 }

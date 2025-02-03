@@ -7,7 +7,7 @@ type (
 		Create(progress model.Chat) error
 	}
 
-	User interface {
+	UserRepoIF interface {
 		FindByUID(uid string) (model.User, error)
 		Create(user model.User) error
 		Update(user model.User) error
