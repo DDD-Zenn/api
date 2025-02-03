@@ -29,9 +29,5 @@ func InitDB() error {
 		return err
 	}
 
-	if err := Migrate(); err != nil {
-		return err
-	}
-
 	return nil
 }

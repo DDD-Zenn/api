@@ -1,20 +1,10 @@
 version: '3.8'
 
 services:
-  ddd-api:
+  db:
     build:
       context: .
-      dockerfile: Dockerfile
-    env_file:
-      - .env
-    container_name: ddd-api-container
-    depends_on:
-      - db
-    ports:
-      - "8080:8080"
-    restart: always
-  db:
-    image: mysql:8.0
+      dockerfile: Dockerfile.db
     container_name: ddd-db-container
     environment:
       MYSQL_ROOT_PASSWORD: root
@@ -23,3 +13,14 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "3306:3306"
+  ddd-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    env_file:
+      - .env
+    container_name: ddd-api-container
+    ports:
+      - "8080:8080"
