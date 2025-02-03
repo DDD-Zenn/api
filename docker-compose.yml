@@ -8,6 +8,18 @@ services:
     env_file:
       - .env
     container_name: ddd-api-container
+    depends_on:
+      - db
     ports:
       - "8080:8080"
     restart: always
+  db:
+    image: mysql:8.0
+    container_name: ddd-db-container
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
