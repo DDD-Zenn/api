@@ -2,17 +2,17 @@ package presentation
 
 import (
 	"net/http"
+
 	"github.com/gin-gonic/gin"
 
-	"github.com/DDD-Zenn/api/external/serviceIF"
 	"github.com/DDD-Zenn/api/application/user"
 )
 
-type UserPresenter struct{
-	userUsecase serviceIF.User
+type UserPresenter struct {
+	userUsecase user.UserIF
 }
 
-func NewUserPresenter(userUsecase serviceIF.User) *UserPresenter {
+func NewUserPresenter(userUsecase user.UserIF) *UserPresenter {
 	return &UserPresenter{userUsecase: userUsecase}
 }
 
@@ -70,4 +70,10 @@ func (h *UserPresenter) Delete(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusNoContent, nil)
+}
+
+func (h *UserPresenter) GetPost(c *gin.Context) {
+	post := h.userUsecase.GetPost()
+
+	c.JSON(http.StatusOK, post)
 }
