@@ -6,15 +6,16 @@ import (
 	"os"
 
 	"github.com/DDD-Zenn/api/application/chat"
+	"github.com/DDD-Zenn/api/application/user"
 	"github.com/DDD-Zenn/api/domain/repoIF"
 	"github.com/DDD-Zenn/api/external/service"
 	"github.com/DDD-Zenn/api/infrastructure/repo"
 	"github.com/google/generative-ai-go/genai"
 	"google.golang.org/api/option"
 
-	"github.com/DDD-Zenn/api/router"
-	"github.com/DDD-Zenn/api/presentation"
 	"github.com/DDD-Zenn/api/infrastructure/database"
+	"github.com/DDD-Zenn/api/presentation"
+	"github.com/DDD-Zenn/api/router"
 )
 
 var chatUsecase *chat.ChatUsecase
@@ -41,14 +42,15 @@ func main() {
 
 	// Gemini サービスを初期化
 	geminiService := service.NewGeminiService(client)
+	xService := service.NewXService()
 
 	// Hello
 	helloPresenter := presentation.NewHelloPresenter()
 
 	// User
 	var userRepo repoIF.UserRepoIF = repo.NewUserRepo(ctx)
-	userService := service.NewUserService(userRepo)
-	userPresenter := presentation.NewUserPresenter(userService)
+	userUsecase := user.NewUserUsecase(userRepo, xService)
+	userPresenter := presentation.NewUserPresenter(userUsecase)
 
 	// Chat
 	var chatRepo repoIF.Chat = repo.NewChatRepo(ctx)

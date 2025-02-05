@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+
 	"github.com/DDD-Zenn/api/domain/model"
 	"github.com/DDD-Zenn/api/domain/repoIF"
 	"github.com/DDD-Zenn/api/infrastructure/database"
@@ -19,9 +20,9 @@ func NewUserRepo(ctx context.Context) repoIF.UserRepoIF {
 
 func (r *UserRepo) Create(user model.User) error {
 	if r.DB == nil {
-        return fmt.Errorf("database connection is nil")
-    }
-    _, err := r.DB.Exec("INSERT INTO users (uid, name) VALUES (?, ?)", user.UID, user.Name)
+		return fmt.Errorf("database connection is nil")
+	}
+	_, err := r.DB.Exec("INSERT INTO users (uid, name) VALUES (?, ?)", user.UID, user.Name)
 	return err
 }
 

@@ -12,5 +12,6 @@ func RegisterUserRoutes(router *gin.Engine, UserPresenter *presentation.UserPres
 		userGroup.GET("/:uid", UserPresenter.FindByUID)
 		userGroup.PUT("/:uid", UserPresenter.Update)
 		userGroup.DELETE("/:uid", UserPresenter.Delete)
+		userGroup.GET("/post", UserPresenter.GetPost)
 	}
 }
