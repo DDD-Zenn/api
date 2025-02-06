@@ -30,7 +30,13 @@ type TweetResponse struct {
 }
 
 func (svc *xsvc) GetMyPost() string {
+	//最新の一件を取得したいときは/recentEPを叩く
 	url := "https://api.x.com/2/tweets/search/recent?query=from:tsunufu_f"
+	//10件まとめて取得したい時は/:id/tweetsを叩く
+	//ここでは例として@tsunufu_fのツイートを取得
+	//今後はユーザーidも動的にいじりたい
+	// id := "1486606447220002818"
+	// url := fmt.Sprintf("https://api.twitter.com/2/users/%s/tweets", id)
 
 	token := os.Getenv("X_BEARER_TOKEN")
 	if token == "" {
